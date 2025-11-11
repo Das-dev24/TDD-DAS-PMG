@@ -45,7 +45,6 @@ namespace PracticaTestProject.Model {
             Assert.AreEqual(apellidosValidos, usuario.Apellidos, "Los Apellidos introducidos no coinciden con los esperados.");
             Assert.AreEqual(EmailValido, usuario.Email, "El Email introducido no coincide con el esperado.");
 
-
             // Probamos que la contraseña se guardó correctamente usando su propio método
             Assert.IsTrue(usuario.VerificarContraseña(contraseñaValida), "La contraseña válida no se verificó correctamente.");
 
