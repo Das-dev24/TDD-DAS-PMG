@@ -250,5 +250,66 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de Estado de Cuenta (Activo, Expirado)
+
+        // ActivarUsuario_CambiaPropiedadActivoATrue
+        [TestMethod]
+        public void ActivarUsuario_CambiaPropiedadActivoATrue() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            Assert.IsFalse(usuario.Activo, "El usuario no de inicializar como inactivo");
+
+            // Act
+            usuario.ActivarUsuario();
+
+            // Assert
+            Assert.IsTrue(usuario.Activo);
+        }
+
+        // DesactivarUsuario_CambiaPropiedadActivoAFalse
+        [TestMethod]
+        public void DesactivarUsuario_CambiaPropiedadActivoAFalse() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            usuario.ActivarUsuario(); // Activamos al Usuario
+            Assert.IsTrue(usuario.Activo, "El usuario no se activó la funcion ActivarUsuario debe estar fallando");
+
+            // Act
+            usuario.DesactivarUsuario();
+
+            // Assert
+            Assert.IsFalse(usuario.Activo);
+        }
+
+        // HaExpirado_ConFechaFutura_DevuelveFalse
+        [TestMethod]
+        public void HaExpirado_ConFechaFutura_DevuelveFalse() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            bool resultado = usuario.HaExpirado();
+
+            // Assert
+            Assert.IsFalse(resultado);
+        }
+
+        // HaExpirado_ConFechaPasada_DevuelveTrue
+        [TestMethod]
+        public void HaExpirado_ConFechaPasada_DevuelveTrue() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            DateTime fechaPasada = DateTime.Now.AddDays(-1);
+            usuario.ActualizarExpiracion(fechaPasada);
+
+            // Act
+            bool resultado = usuario.HaExpirado();
+
+            // Assert
+            Assert.IsTrue(resultado);
+        }
+
+        #endregion
+
     }
 }
