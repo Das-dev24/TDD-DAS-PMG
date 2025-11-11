@@ -240,7 +240,7 @@ namespace PracticaTestProject.Model {
         [DataRow("test@localhost", "Dominio sin TLD (inválido)")]
         public void ValidarEmail_EmailIncorrecta_LanzaFormatException(string emailIncorrecto, string descripcionCaso) {
             // Arrange
-            var usuario = new Usuario(_validUsuario, _validNombre, _validApellidos, _validPassword, _validEmail);
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
 
             // Act & Assert
             Assert.ThrowsException<FormatException>(() => {
