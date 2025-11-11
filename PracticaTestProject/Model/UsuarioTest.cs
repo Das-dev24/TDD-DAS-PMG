@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Practica.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace PracticaTestProject.Model {
             var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
 
             // Assert (Afirmar)
-            Assert.AreEqual(usuarioValido, usuario.Usuario, "El Usuario no coincide con el esperado.");
+            Assert.AreEqual(usuarioValido, usuario.Username, "El Usuario no coincide con el esperado.");
             Assert.AreEqual(nombreValido, usuario.Nombre, "El Nombre introducido no coincide con el esperado.");
             Assert.AreEqual(apellidosValidos, usuario.Apellidos, "Los Apellidos introducidos no coinciden con los esperados.");
             Assert.AreEqual(EmailValido, usuario.Email, "El Email introducido no coincide con el esperado.");
