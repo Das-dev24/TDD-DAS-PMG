@@ -98,7 +98,7 @@ namespace PracticaTestProject.Model {
             var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
 
             // Act
-            bool resultado = usuario.ValidarContraseña("ContraseñaValida123");
+            bool resultado = usuario.ValidarContraseña("ContraseñaValida123!");
 
             // Assert
             Assert.IsTrue(resultado);
