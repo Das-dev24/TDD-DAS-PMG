@@ -250,6 +250,65 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de ActualizarDatosPersonales
+
+        // Caso de prueba: ActualizarDatos_DatosValidos_ActualizaPropiedades
+        [TestMethod]
+        public void ActualizarDatos_DatosValidos_ActualizaPropiedades() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            string nuevoNombre = "Usuario2";
+            string nuevosApellidos = "Diez Normal";
+            string nuevoEmail = "example2@example2.com";
+
+            // Act
+            usuario.ActualizarDatosPersonales(nuevoNombre, nuevosApellidos, nuevoEmail);
+
+            // Assert
+            Assert.AreEqual(nuevoNombre, usuario.Nombre);
+            Assert.AreEqual(nuevosApellidos, usuario.Apellidos);
+            Assert.AreEqual(nuevoEmail, usuario.Email);
+        }
+
+        // ActualizarDatos_NuloOVacio_LanzaArgumentException
+        [DataTestMethod]
+        [DataRow(null, "Apellidos", "email@test.com", "El parametro del nuevo Nombre no puede ser Vacio/Nulo")]
+        [DataRow("", "Apellidos", "email@test.com", "El parametro del nuevo Nombre no puede ser Vacio/Nulo")]
+        [DataRow(" ", "Apellidos", "email@test.com", "El parametro del nuevo Nombre no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", null, "email@test.com", "El parametro del nuevo Apellidos no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", "", "email@test.com", "El parametro del nuevo Apellidos no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", " ", "email@test.com", "El parametro del nuevo Apellidos no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", "Apellidos", null, "El parametro del nuevo Email no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", "Apellidos", "", "El parametro del nuevo Email no puede ser Vacio/Nulo")]
+        [DataRow("Nombre", "Apellidos", " ", "El parametro del nuevo Email no puede ser Vacio/Nulo")]
+        public void ActualizarDatos_NuloOVacio_LanzaArgumentException(string nombre, string apellidos, string email, string expectedParamName) {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act & Assert
+            var ex = Assert.ThrowsException<ArgumentException>(() => {
+                usuario.ActualizarDatosPersonales(nombre, apellidos, email);
+            });
+
+            // Verificar el mensaje de la excepción.
+            Assert.AreEqual(expectedParamName, ex.Message);
+        }
+
+        // ActualizarDatos_EmailIncorrecta_LanzaFormatException
+        [DataTestMethod]
+        [DataRow("Nombre", "Apellidos", "email-invalido", "El formato del nuevo Email no es valido")]
+        public void ActualizarDatos_EmailIncorrecta_LanzaFormatException(string nombre, string apellidos, string email, string expectedParamName) {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act & Assert
+            Assert.ThrowsException<FormatException>(() => {
+                usuario.ActualizarDatosPersonales(nombre, apellidos, email);
+            }, expectedParamName);
+        }
+
+        #endregion
+
         #region Pruebas de Estado de Cuenta (Activo, Expirado)
 
         // ActivarUsuario_CambiaPropiedadActivoATrue
