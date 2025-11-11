@@ -206,5 +206,49 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de Email
+
+        // ValidarEmail_EmailCorrecta_DevuelveTrue
+        [TestMethod]
+        public void ValidarEmail_EmailCorrecta_DevuelveTrue() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            bool resultado = usuario.ValidarEmail("example@example.com");
+
+            // Assert
+            Assert.IsTrue(resultado);
+        }
+
+        // ValidarEmail_EmailIncorrecta_LanzaFormatException
+        [DataTestMethod]
+        [DataRow(null, "Un email nulo debe ser inválido")]
+        [DataRow("", "Un email vacío debe ser inválido")]
+        [DataRow("   ", "Un email con solo espacios debe ser inválido")]
+        [DataRow("username @ domain.com", "Un email con espacios intermedios debe ser inválido")]
+        [DataRow(" test@test.com", "Un email con espacios al inicio debe ser inválido")]
+        [DataRow("test@test.com ", "Un email con espacios al final debe ser inválido")]
+        [DataRow("plainaddress", "No contiene '@'")]
+        [DataRow("test@.com", "Dominio empieza con punto (inválido)")]
+        [DataRow("test@domain.com.", "Dominio termina con punto (inválido)")]
+        [DataRow("test@domain..com", "Dominio contiene puntos consecutivos (inválido)")]
+        [DataRow("test@domain.c", "TLD es menor de 2 caracteres (inválido)")]
+        [DataRow("@missinglocalpart.com", "Falta la parte local antes de '@'")]
+        [DataRow("global@", "Falta el dominio después de '@'")]
+        [DataRow("test@@example.com", "Contiene múltiples '@'")]
+        [DataRow("test@localhost", "Dominio sin TLD (inválido)")]
+        public void ValidarEmail_EmailIncorrecta_LanzaFormatException(string emailIncorrecto, string descripcionCaso) {
+            // Arrange
+            var usuario = new Usuario(_validUsuario, _validNombre, _validApellidos, _validPassword, _validEmail);
+
+            // Act & Assert
+            Assert.ThrowsException<FormatException>(() => {
+                usuario.ValidarEmail(emailIncorrecto);
+            }, descripcionCaso);
+        }
+
+        #endregion
+
     }
 }
