@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
+using System.Security;
 using System.Text;
 
 namespace PracticaTestProject.Model {
@@ -84,6 +85,123 @@ namespace PracticaTestProject.Model {
 
             // Verificar el mensaje de la excepción.
             Assert.AreEqual(expectedParamName, ex.Message);
+        }
+
+        #endregion
+
+        #region Pruebas de Contraseña (Validar, Verificar, Cambiar)
+
+        // ValidarContraseña_ContraseñaCorrecta_DevuelveTrue
+        [TestMethod]
+        public void ValidarContraseña_ContraseñaCorrecta_DevuelveTrue() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            bool resultado = usuario.ValidarContraseña("ContraseñaValida123");
+
+            // Assert
+            Assert.IsTrue(resultado);
+        }
+
+        // ValidarContraseña_ContraseñaIncorrecta_LanzaSecurityException
+        [DataTestMethod]
+        [DataRow("User123!")]               // Menos de 12
+        [DataRow("user1234567!")]           // Sin mayúscula
+        [DataRow("USER1234567!")]           // Sin minúscula
+        [DataRow("User12345678")]           // Sin caracter especial
+        [DataRow("User 123456!")]           // Con espacios
+        public void ValidarContraseña_ContraseñaIncorrecta_LanzaSecurityException(string passIncorrecta) {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act & Assert
+            Assert.ThrowsException<SecurityException>(() => {
+                usuario.ValidarContraseña(passIncorrecta);
+            });
+        }
+
+        // VerificarContraseña_ContraseñaCorrecta_DevuelveTrue
+        [TestMethod]
+        public void VerificarContraseña_ContraseñaCorrecta_DevuelveTrue() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            bool resultado = usuario.VerificarContraseña(contraseñaValida);
+
+            // Assert
+            Assert.IsTrue(resultado);
+        }
+
+        // VerificarContraseña_ContraseñaIncorrecta_DevuelveFalse
+        [TestMethod]
+        public void VerificarContraseña_ContraseñaIncorrecta_DevuelveFalse() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            bool resultado = usuario.VerificarContraseña("User123!");
+
+            // Assert
+            Assert.IsFalse(resultado);
+        }
+
+        // CambiarContraseña_ContraseñaValida_ActualizaCorrectamente
+        [TestMethod]
+        public void CambiarContraseña_ContraseñaValida_ActualizaCorrectamente() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            string nuevaPassword = "NuevaContraseña123!";
+
+            // Act
+            bool resultado = usuario.CambiarContraseña(nuevaPassword, contraseñaValida);
+
+            // Assert
+            Assert.IsTrue(resultado, "CambiarContraseña debió devolver 'true'");
+            Assert.IsTrue(usuario.VerificarContraseña(nuevaPassword), "La nueva contraseña no se verificó correctamente.");
+            Assert.IsFalse(usuario.VerificarContraseña(contraseñaValida), "La contraseña antigua sigue funcionando.");
+        }
+
+        // CambiarContraseña_ContraseñaNulaOVacia_LanzaArgumentException
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CambiarContraseña_ContraseñaNulaOVacia_LanzaArgumentException() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            usuario.CambiarContraseña(null, contraseñaValida);
+
+            // Assert - [ExpectedException] se encarga
+        }
+
+        // CambiarContraseña_ContraseñaActualIncorrecta_DevuelveFalse
+        [TestMethod]
+        public void CambiarContraseña_ContraseñaActualIncorrecta_DevuelveFalse() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+            string nuevaPassword = "NuevaPassSuperSegura456!";
+
+            // Act
+            bool resultado = usuario.CambiarContraseña(nuevaPassword, "ContraseñaEquivocadaActual123!");
+
+            // Assert
+            Assert.IsFalse(resultado, "CambiarContraseña debió devolver 'false'");
+            Assert.IsTrue(usuario.VerificarContraseña(contraseñaValida), "La contraseña original debe seguir funcionando.");
+        }
+
+        // CambiarContraseña_NuevaPassNoCumplePolitica_LanzaSecurityException
+        [TestMethod]
+        [ExpectedException(typeof(SecurityException))]
+        public void CambiarContraseña_NuevaPassNoCumplePolitica_LanzaSecurityException() {
+            // Arrange
+            var usuario = new Usuario(usuarioValido, nombreValido, apellidosValidos, contraseñaValida, EmailValido);
+
+            // Act
+            usuario.CambiarContraseña("User123!", contraseñaValida);
+
+            // Assert - [ExpectedException] se encarga
         }
 
         #endregion
