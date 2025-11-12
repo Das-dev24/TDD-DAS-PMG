@@ -45,6 +45,8 @@ namespace PracticaTestProject.Model
             Assert.ThrowsException<ArgumentException>(() => new Rol(nombre, descripcion));
         }
 
+        #endregion
+
         #region Pruebas del Método AgregarPermiso
         [TestMethod]
         public void AgregarPermiso_PermisoValido_AñadePermisoAHashSet()
@@ -83,6 +85,49 @@ namespace PracticaTestProject.Model
             Assert.IsTrue(rol.TienePermiso(permiso));
         }
 
+
+        #endregion
+
+        #region Pruebas del Método QuitarPermiso
+
+        [TestMethod]
+        public void QuitarPermiso_PermisoExistente_EliminaPermisoDeHashSet()
+        {
+            Rol rol = new Rol("Manager", "Rol de gerente");
+            string permiso = "aprobar_requisitos";
+            rol.AgregarPermiso(permiso);
+            Assert.AreEqual(1, rol.ObtenerPermisos().Count, "Pre-condición fallida: El permiso no se agregó.");
+
+            rol.QuitarPermiso(permiso);
+
+            Assert.AreEqual(0, rol.ObtenerPermisos().Count);
+            Assert.IsFalse(rol.TienePermiso(permiso));
+        }
+
+        [TestMethod]
+        public void QuitarPermiso_PermisoNoExistente_NoLanzaExcepcion()
+        {
+
+            Rol rol = new Rol("Manager", "Rol de gerente");
+            string permisoExistente = "otro_permiso";
+            string permisoNoExistente = "permiso_que_no_existe";
+            rol.AgregarPermiso(permisoExistente);
+
+            rol.QuitarPermiso(permisoNoExistente);
+
+            Assert.AreEqual(1, rol.ObtenerPermisos().Count);
+            Assert.IsFalse(rol.TienePermiso(permisoNoExistente));
+        }
+
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("   ")]
+        public void QuitarPermiso_PermisoNuloOVacio_LanzaArgumentException(string permiso)
+        {
+            Rol rol = new Rol("Observer", "Rol de observador");
+            Assert.ThrowsException<ArgumentException>(() => rol.QuitarPermiso(permiso));
+        }
 
 
     }
