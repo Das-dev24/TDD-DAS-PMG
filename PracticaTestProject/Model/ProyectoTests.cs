@@ -341,6 +341,95 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de ObtenerPermisosDeUsuario
 
+        // ObtenerPermisos_UsuarioConUnRol_DevuelvePermisosDeEseRol
+        [TestMethod]
+        public void ObtenerPermisos_UsuarioConUnRol_DevuelvePermisosDeEseRol() {
+            // Arrange
+            // rolValido1 tiene [CREAR, EDITAR, BORRAR]
+            proyecto.AgregarRol(rolValido1);
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+            var permisosEsperados = new List<string> { "CREAR", "EDITAR", "BORRAR" };
+
+            // Act
+            var permisosObtenidos = proyecto.ObtenerPermisosDeUsuario(usuarioValido);
+
+            // Assert
+            Assert.IsNotNull(permisosObtenidos);
+            // Usamos CollectionAssert.AreEquivalent para comparar listas sin importar el orden
+            CollectionAssert.AreEquivalent(permisosEsperados, permisosObtenidos);
+            Assert.AreEqual(permisosEsperados.Count, permisosObtenidos.Count);
+        }
+
+        // ObtenerPermisos_UsuarioNoAsignado_DevuelveListaVacia
+        [TestMethod]
+        public void ObtenerPermisos_UsuarioNoAsignado_DevuelveListaVacia() {
+            // Arrange
+            // usuarioValido existe pero no está en el diccionario AsignacionesUsuarios
+
+            // Act
+            var permisosObtenidos = proyecto.ObtenerPermisosDeUsuario(usuarioValido);
+
+            // Assert
+            Assert.IsNotNull(permisosObtenidos, "La lista no debe ser nula.");
+            Assert.AreEqual(0, permisosObtenidos.Count, "La lista debe estar vacía.");
+        }
+
+        // ObtenerPermisos_UsuarioConMultiplesRoles_DevuelveSumaDePermisos
+        [TestMethod]
+        public void ObtenerPermisos_UsuarioConMultiplesRoles_DevuelveSumaDePermisos() {
+            // Arrange
+            proyecto.AgregarRol(rolValido1); // [CREAR, EDITAR, BORRAR]
+            proyecto.AgregarRol(rolValido2); // [LEER]
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido2);
+
+            var permisosEsperados = new List<string> { "CREAR", "EDITAR", "BORRAR", "LEER" };
+
+            // Act
+            var permisosObtenidos = proyecto.ObtenerPermisosDeUsuario(usuarioValido);
+
+            // Assert
+            Assert.IsNotNull(permisosObtenidos);
+            CollectionAssert.AreEquivalent(permisosEsperados, permisosObtenidos);
+            Assert.AreEqual(permisosEsperados.Count, permisosObtenidos.Count);
+        }
+
+        // ObtenerPermisos_RolesConPermisosSolapados_DevuelveUnionSinDuplicados
+        [TestMethod]
+        public void ObtenerPermisos_RolesConPermisosSolapados_DevuelveUnionSinDuplicados() {
+            // Arrange
+            proyecto.AgregarRol(rolValido2); // [LEER]
+            proyecto.AgregarRol(rolConPermisosSolapados); // [LEER, EDITAR]
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido2);
+            proyecto.AsignarRolAUsuario(usuarioValido, rolConPermisosSolapados);
+
+            // El resultado debe ser la unión sin duplicados
+            var permisosEsperados = new List<string> { "LEER", "EDITAR" };
+
+            // Act
+            var permisosObtenidos = proyecto.ObtenerPermisosDeUsuario(usuarioValido);
+
+            // Assert
+            Assert.IsNotNull(permisosObtenidos);
+            CollectionAssert.AreEquivalent(permisosEsperados, permisosObtenidos);
+            // Comprobamos que el conteo es 2 (sin duplicados)
+            Assert.AreEqual(permisosEsperados.Count, permisosObtenidos.Count, "El conteo debe ser 2 (LEER, EDITAR), no 3.");
+        }
+
+        // ObtenerPermisos_UsuarioNulo_LanzaArgumentNullException
+        [TestMethod]
+        public void ObtenerPermisos_UsuarioNulo_LanzaArgumentNullException() {
+            // Arrange
+            // proyecto creado en Setup
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                proyecto.ObtenerPermisosDeUsuario(null);
+            });
+        }
+
+        #endregion
     }
 }
