@@ -128,6 +128,81 @@ namespace PracticaTestProject.Model
             Rol rol = new Rol("Observer", "Rol de observador");
             Assert.ThrowsException<ArgumentException>(() => rol.QuitarPermiso(permiso));
         }
+        #endregion
+
+
+        #region Pruebas de ObtenerPermisos y TienePermiso
+
+        [TestMethod]
+        public void ObtenerPermisos_ConVariosPermisos_DevuelveHashSetCorrecto()
+        {
+            // Arrange
+            Rol rol = new Rol("SuperAdmin", "Admin total");
+            string p1 = "permiso_A";
+            string p2 = "permiso_B";
+            rol.AgregarPermiso(p1);
+            rol.AgregarPermiso(p2);
+
+            // Act
+            HashSet<string> permisos = rol.ObtenerPermisos();
+
+            // Assert
+            Assert.IsNotNull(permisos);
+            Assert.AreEqual(2, permisos.Count);
+            Assert.IsTrue(permisos.Contains(p1));
+            Assert.IsTrue(permisos.Contains(p2));
+        }
+
+        [TestMethod]
+        public void ObtenerPermisos_SinPermisos_DevuelveHashSetVacio()
+        {
+            Rol rol = new Rol("SuperAdmin", "Admin total");
+
+            HashSet<string> permisos = rol.ObtenerPermisos();
+
+            Assert.IsNotNull(permisos);
+            Assert.AreEqual(0, permisos.Count);
+        }
+
+        [TestMethod]
+        public void ObtenerPermisos_DevuelveCopia_ModificarCopiaNoAfectaOriginal()
+        {
+            Rol rol = new Rol("Auditor", "Rol de auditor");
+            string p1 = "leer_logs";
+            rol.AgregarPermiso(p1);
+
+            HashSet<string> copiaPermisos = rol.ObtenerPermisos();
+            copiaPermisos.Add("modificar_logs");
+
+            Assert.AreEqual(2, copiaPermisos.Count);
+
+            Assert.AreEqual(1, rol.ObtenerPermisos().Count);
+            Assert.IsTrue(rol.TienePermiso(p1));
+            Assert.IsFalse(rol.TienePermiso("modificar_logs"));
+        }
+
+        [TestMethod]
+        public void TienePermiso_PermisoExiste_DevuelveTrue()
+        {
+            Rol rol = new Rol("SuperAdmin", "Admin total");
+            string p1 = "permiso_A";
+            rol.AgregarPermiso(p1);
+
+            bool tiene = rol.TienePermiso(p1);
+
+            Assert.IsTrue(tiene);
+        }
+
+        [TestMethod]
+        public void TienePermiso_PermisoNoExiste_DevuelveFalse()
+        {
+            Rol rol = new Rol("SuperAdmin", "Admin total");
+            rol.AgregarPermiso("permiso_A");
+
+            bool tiene = rol.TienePermiso("permiso_B_no_existe");
+
+            Assert.IsFalse(tiene);
+        }
 
 
     }
