@@ -136,17 +136,14 @@ namespace PracticaTestProject.Model
         [TestMethod]
         public void ObtenerPermisos_ConVariosPermisos_DevuelveHashSetCorrecto()
         {
-            // Arrange
             Rol rol = new Rol("SuperAdmin", "Admin total");
             string p1 = "permiso_A";
             string p2 = "permiso_B";
             rol.AgregarPermiso(p1);
             rol.AgregarPermiso(p2);
 
-            // Act
             HashSet<string> permisos = rol.ObtenerPermisos();
 
-            // Assert
             Assert.IsNotNull(permisos);
             Assert.AreEqual(2, permisos.Count);
             Assert.IsTrue(permisos.Contains(p1));
