@@ -3,16 +3,14 @@ using Practica.Model;
 using System;
 using System.Collections.Generic;
 
-namespace PracticaTestProject.Model
-{
+namespace PracticaTestProject.Model {
     [TestClass]
-    public class RolTests
-    {
+    public class RolTests {
+
         #region Pruebas del Constructor
 
         [TestMethod]
-        public void Constructor_DatosValidos_AsignaPropiedadesCorrectamente()
-        {
+        public void Constructor_DatosValidos_AsignaPropiedadesCorrectamente() {
             string nombre = "Admin";
             string descripcion = "Rol de administrador";
 
@@ -22,8 +20,7 @@ namespace PracticaTestProject.Model
             Assert.AreEqual(descripcion, rol.Descripcion);
         }
         [TestMethod]
-        public void Constructor_DatosValidos_InicializaHashSetPermisosVacio()
-        {
+        public void Constructor_DatosValidos_InicializaHashSetPermisosVacio() {
             string nombre = "Editor";
             string descripcion = "Rol de editor";
 
@@ -37,8 +34,7 @@ namespace PracticaTestProject.Model
         [DataRow(null)]
         [DataRow("")]
         [DataRow("   ")]
-        public void Constructor_NombreNuloOVacio_LanzaArgumentException(string nombre)
-        {
+        public void Constructor_NombreNuloOVacio_LanzaArgumentException(string nombre) {
             string descripcion = "Descripción válida";
 
             Assert.ThrowsException<ArgumentException>(() => new Rol(nombre, descripcion));
@@ -48,8 +44,7 @@ namespace PracticaTestProject.Model
 
         #region Pruebas del Método AgregarPermiso
         [TestMethod]
-        public void AgregarPermiso_PermisoValido_AñadePermisoAHashSet()
-        {
+        public void AgregarPermiso_PermisoValido_AñadePermisoAHashSet() {
             Rol rol = new Rol("Tester", "Rol de pruebas");
             string permiso = "ejecutar_pruebas";
 
@@ -63,16 +58,14 @@ namespace PracticaTestProject.Model
         [DataRow(null)]
         [DataRow("")]
         [DataRow("   ")]
-        public void AgregarPermiso_PermisoNuloOVacio_LanzaArgumentException(string permiso)
-        {
+        public void AgregarPermiso_PermisoNuloOVacio_LanzaArgumentException(string permiso) {
             Rol rol = new Rol("Guest", "Rol de invitado");
 
             Assert.ThrowsException<ArgumentException>(() => rol.AgregarPermiso(permiso));
         }
 
         [TestMethod]
-        public void AgregarPermiso_PermisoDuplicado_HashSetIgnoraDuplicadoSinExcepcion()
-        {
+        public void AgregarPermiso_PermisoDuplicado_HashSetIgnoraDuplicadoSinExcepcion() {
             Rol rol = new Rol("Developer", "Rol de desarrollador");
             string permiso = "escribir_codigo";
             rol.AgregarPermiso(permiso);
@@ -90,8 +83,7 @@ namespace PracticaTestProject.Model
         #region Pruebas del Método QuitarPermiso
 
         [TestMethod]
-        public void QuitarPermiso_PermisoExistente_EliminaPermisoDeHashSet()
-        {
+        public void QuitarPermiso_PermisoExistente_EliminaPermisoDeHashSet() {
             Rol rol = new Rol("Manager", "Rol de gerente");
             string permiso = "aprobar_requisitos";
             rol.AgregarPermiso(permiso);
@@ -104,8 +96,7 @@ namespace PracticaTestProject.Model
         }
 
         [TestMethod]
-        public void QuitarPermiso_PermisoNoExistente_NoLanzaExcepcion()
-        {
+        public void QuitarPermiso_PermisoNoExistente_NoLanzaExcepcion() {
 
             Rol rol = new Rol("Manager", "Rol de gerente");
             string permisoExistente = "otro_permiso";
@@ -122,19 +113,16 @@ namespace PracticaTestProject.Model
         [DataRow(null)]
         [DataRow("")]
         [DataRow("   ")]
-        public void QuitarPermiso_PermisoNuloOVacio_LanzaArgumentException(string permiso)
-        {
+        public void QuitarPermiso_PermisoNuloOVacio_LanzaArgumentException(string permiso) {
             Rol rol = new Rol("Observer", "Rol de observador");
             Assert.ThrowsException<ArgumentException>(() => rol.QuitarPermiso(permiso));
         }
         #endregion
 
-
         #region Pruebas de ObtenerPermisos y TienePermiso
 
         [TestMethod]
-        public void ObtenerPermisos_ConVariosPermisos_DevuelveHashSetCorrecto()
-        {
+        public void ObtenerPermisos_ConVariosPermisos_DevuelveHashSetCorrecto() {
             Rol rol = new Rol("SuperAdmin", "Admin total");
             string p1 = "permiso_A";
             string p2 = "permiso_B";
@@ -150,8 +138,7 @@ namespace PracticaTestProject.Model
         }
 
         [TestMethod]
-        public void ObtenerPermisos_SinPermisos_DevuelveHashSetVacio()
-        {
+        public void ObtenerPermisos_SinPermisos_DevuelveHashSetVacio() {
             Rol rol = new Rol("SuperAdmin", "Admin total");
 
             HashSet<string> permisos = rol.ObtenerPermisos();
@@ -161,8 +148,7 @@ namespace PracticaTestProject.Model
         }
 
         [TestMethod]
-        public void ObtenerPermisos_DevuelveCopia_ModificarCopiaNoAfectaOriginal()
-        {
+        public void ObtenerPermisos_DevuelveCopia_ModificarCopiaNoAfectaOriginal() {
             Rol rol = new Rol("Auditor", "Rol de auditor");
             string p1 = "leer_logs";
             rol.AgregarPermiso(p1);
@@ -178,8 +164,7 @@ namespace PracticaTestProject.Model
         }
 
         [TestMethod]
-        public void TienePermiso_PermisoExiste_DevuelveTrue()
-        {
+        public void TienePermiso_PermisoExiste_DevuelveTrue() {
             Rol rol = new Rol("SuperAdmin", "Admin total");
             string p1 = "permiso_A";
             rol.AgregarPermiso(p1);
@@ -190,8 +175,7 @@ namespace PracticaTestProject.Model
         }
 
         [TestMethod]
-        public void TienePermiso_PermisoNoExiste_DevuelveFalse()
-        {
+        public void TienePermiso_PermisoNoExiste_DevuelveFalse() {
             Rol rol = new Rol("SuperAdmin", "Admin total");
             rol.AgregarPermiso("permiso_A");
 
