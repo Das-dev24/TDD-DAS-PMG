@@ -51,6 +51,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
+    <Compile Include="Model\ProyectoTests.cs" />
+>>>>>>> 4b51390db1f7412a249d5bbf712348550668c42c
     <Compile Include="Model\RolTest.cs" />
     <Compile Include="Model\UsuarioTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
