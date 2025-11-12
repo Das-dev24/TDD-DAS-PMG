@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic; // Necesario para HashSet
 
-namespace TDD_ABC_DEF.Models // Asegúrate de que coincida con tu proyecto
+namespace Practica.Model
 {
     public class Rol
     {
