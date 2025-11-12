@@ -130,6 +130,100 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de AsignarRolAUsuario
+
+        // AsignarRol_UsuarioYRolValidos_AsignaCorrectamente
+        [TestMethod]
+        public void AsignarRol_UsuarioYRolValidos_AsignaCorrectamente() {
+            // Arrange
+            // El rol debe existir en RolesDisponibles primero
+            proyecto.AgregarRol(rolValido1);
+
+            // Act
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+
+            // Assert
+            // Verifica que el usuario está en el diccionario (usando Username como clave)
+            Assert.IsTrue(proyecto.AsignacionesUsuarios.ContainsKey(usuarioValido.Username));
+            // Verifica que la lista de roles del usuario contiene el rol
+            var rolesAsignados = proyecto.AsignacionesUsuarios[usuarioValido.Username];
+            Assert.AreEqual(1, rolesAsignados.Count);
+            Assert.IsTrue(rolesAsignados.Contains(rolValido1));
+        }
+
+        // AsignarRol_UsuarioNuevo_CreaEntradaEnDiccionario
+        [TestMethod]
+        public void AsignarRol_UsuarioNuevo_CreaEntradaEnDiccionario() {
+            // Arrange
+            proyecto.AgregarRol(rolValido1);
+            // Pre-condición: El diccionario está vacío
+            Assert.AreEqual(0, proyecto.AsignacionesUsuarios.Count, "El diccionario debe estar vacío al inicio.");
+
+            // Act
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+
+            // Assert
+            Assert.AreEqual(1, proyecto.AsignacionesUsuarios.Count, "El diccionario debe contener una entrada.");
+            Assert.IsTrue(proyecto.AsignacionesUsuarios.ContainsKey(usuarioValido.Username), "La clave debe ser el Username del usuario.");
+        }
+
+        // AsignarRol_RolNoEnDisponibles_LanzaInvalidOperationException
+        [TestMethod]
+        public void AsignarRol_RolNoEnDisponibles_LanzaInvalidOperationException() {
+            // Arrange
+            // No añadimos el rolValido1 a RolesDisponibles
+
+            // Act & Assert
+            Assert.ThrowsException<InvalidOperationException>(() => {
+                proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+            }, "Debe lanzar excepción si el rol no está en RolesDisponibles.");
+        }
+
+        // AsignarRol_AsignarRolDuplicado_NoAñadeDuplicadoYNoLanzaExcepcion
+        [TestMethod]
+        public void AsignarRol_AsignarRolDuplicado_NoAñadeDuplicadoYNoLanzaExcepcion() {
+            // Arrange
+            proyecto.AgregarRol(rolValido1);
+            // Asignamos una vez
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+            var rolesAsignados = proyecto.AsignacionesUsuarios[usuarioValido.Username];
+            Assert.AreEqual(1, rolesAsignados.Count, "El usuario debe tener 1 rol.");
+
+            // Act
+            // Intentamos asignar el MISMO rol de nuevo
+            proyecto.AsignarRolAUsuario(usuarioValido, rolValido1);
+
+            // Assert
+            // El método debe finalizar sin error y el conteo seguir siendo 1
+            Assert.AreEqual(1, rolesAsignados.Count, "El conteo de roles no debe cambiar.");
+        }
+
+        // AsignarRol_UsuarioNulo_LanzaArgumentNullException
+        [TestMethod]
+        public void AsignarRol_UsuarioNulo_LanzaArgumentNullException() {
+            // Arrange
+            proyecto.AgregarRol(rolValido1);
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                proyecto.AsignarRolAUsuario(null, rolValido1);
+            });
+        }
+
+        // AsignarRol_RolNulo_LanzaArgumentNullException
+        [TestMethod]
+        public void AsignarRol_RolNulo_LanzaArgumentNullException() {
+            // Arrange
+            // No se necesita añadir rol
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                proyecto.AsignarRolAUsuario(usuarioValido, null);
+            });
+        }
+
+        #endregion
+
 
     }
 }
