@@ -51,6 +51,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\AppTest.cs" />
     <Compile Include="Model\ProyectoTests.cs" />
     <Compile Include="Model\RolTest.cs" />
     <Compile Include="Model\UsuarioTest.cs" />
