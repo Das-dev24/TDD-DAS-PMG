@@ -28,5 +28,43 @@ namespace Practica.Model {
                 PermisosPorProyecto[proyecto] = new HashSet<string>(listaPermisos);
             }
         }
+
+        public bool TienePermisoEnProyecto(Proyecto proyecto, string permiso) {
+            if (proyecto == null)
+                throw new ArgumentNullException(nameof(proyecto));
+
+            if (string.IsNullOrEmpty(permiso))
+                throw new ArgumentException("El permiso no puede ser nulo o vacío.", nameof(permiso));
+
+            // Si el proyecto está en esta sesión, verificamos el permiso
+            if (PermisosPorProyecto.ContainsKey(proyecto)) {
+                return PermisosPorProyecto[proyecto].Contains(permiso);
+            }
+
+            // Si el proyecto no está cargado o no existe en la sesión, asumimos sin permisos
+            return false;
+        }
+
+        public HashSet<string> ObtenerPermisosDeProyecto(Proyecto proyecto) {
+            if (proyecto == null)
+                throw new ArgumentNullException(nameof(proyecto));
+
+            if (PermisosPorProyecto.ContainsKey(proyecto)) {
+                return new HashSet<string>(PermisosPorProyecto[proyecto]);
+            }
+
+            return new HashSet<string>();
+        }
+
+        public HashSet<string> ObtenerPermisosGlobales() {
+            HashSet<string> permisosGlobales = new HashSet<string>();
+
+            foreach (var permisosProyecto in PermisosPorProyecto.Values) {
+                // UnionWith añade elementos al set actual, ignorando duplicados automáticamente
+                permisosGlobales.UnionWith(permisosProyecto);
+            }
+
+            return permisosGlobales;
+        }
     }
 }
