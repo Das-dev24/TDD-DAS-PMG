@@ -11,6 +11,7 @@ namespace PracticaTestProject.Model {
 
         // Variables de entorno para las pruebas
         private Usuario usuarioValido;
+        private Usuario usuarioSinRoles;
         private Proyecto proyectoA;
         private Proyecto proyectoB;
         private Proyecto proyectoSinAsignacion; // Proyecto donde el usuario no tiene roles
@@ -95,6 +96,81 @@ namespace PracticaTestProject.Model {
             Assert.ThrowsException<ArgumentNullException>(() => {
                 new App(usuarioValido, null);
             });
+        }
+
+        #endregion
+
+        #region Pruebas de TienePermisoEnProyecto
+
+        // TienePermiso_PermisoExisteEnProyecto_DevuelveTrue
+        [TestMethod]
+        public void TienePermiso_PermisoExisteEnProyecto_DevuelveTrue() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            bool tienePermiso = app.TienePermisoEnProyecto(proyectoA, "BORRAR");
+
+            // Assert
+            Assert.IsTrue(tienePermiso, "El usuario debería tener permiso BORRAR en Proyecto A.");
+        }
+
+        // TienePermiso_PermisoNoExisteEnProyecto_DevuelveFalse
+        [TestMethod]
+        public void TienePermiso_PermisoNoExisteEnProyecto_DevuelveFalse() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            // El usuario es Admin en Proyecto A, pero "AUDITAR" no está en sus roles
+            bool tienePermiso = app.TienePermisoEnProyecto(proyectoA, "AUDITAR");
+
+            // Assert
+            Assert.IsFalse(tienePermiso, "El usuario no debería tener un permiso que no posee su rol.");
+        }
+
+        // TienePermiso_UsuarioNoTieneRolesEnProyecto_DevuelveFalse
+        [TestMethod]
+        public void TienePermiso_UsuarioNoTieneRolesEnProyecto_DevuelveFalse() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            // proyectoSinAsignacion está mapeado, pero el usuario no tiene roles allí
+            bool tienePermiso = app.TienePermisoEnProyecto(proyectoSinAsignacion, "LEER");
+
+            // Assert
+            Assert.IsFalse(tienePermiso, "El usuario no debería tener permisos en un proyecto donde no tiene roles.");
+        }
+
+        // TienePermiso_ProyectoNoMapeado_DevuelveFalse
+        [TestMethod]
+        public void TienePermiso_ProyectoNoMapeado_DevuelveFalse() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            // Consultamos por un proyecto que no estaba en la lista inicial
+            bool tienePermiso = app.TienePermisoEnProyecto(proyectoNoListado, "LEER");
+
+            // Assert
+            Assert.IsFalse(tienePermiso, "Debe devolver false para proyectos desconocidos/no cargados.");
+        }
+
+        // TienePermiso_ArgumentosInvalidos_LanzaArgumentException
+        [TestMethod]
+        public void TienePermiso_ArgumentosInvalidos_LanzaExcepcion() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                app.TienePermisoEnProyecto(null, "LEER");
+            }, "Proyecto nulo debe lanzar ArgumentNullException");
+
+            Assert.ThrowsException<ArgumentException>(() => {
+                app.TienePermisoEnProyecto(proyectoA, "");
+            }, "Permiso vacío debe lanzar ArgumentException");
         }
 
         #endregion
