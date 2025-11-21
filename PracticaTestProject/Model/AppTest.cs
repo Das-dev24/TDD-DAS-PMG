@@ -175,5 +175,92 @@ namespace PracticaTestProject.Model {
 
         #endregion
 
+        #region Pruebas de ObtenerPermisosDeProyecto
+
+        // ObtenerPermisos_ProyectoValido_DevuelveHashSetPermisosCorrecto
+        [TestMethod]
+        public void ObtenerPermisos_ProyectoValido_DevuelveHashSetPermisosCorrecto() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+            var esperados = new List<string> { "LEER", "ESCRIBIR", "BORRAR" };
+
+            // Act
+            var permisos = app.ObtenerPermisosDeProyecto(proyectoA);
+
+            // Assert
+            Assert.IsNotNull(permisos);
+            Assert.AreEqual(3, permisos.Count);
+            // Verificamos que contenga todos los esperados
+            foreach (var p in esperados) {
+                Assert.IsTrue(permisos.Contains(p));
+            }
+        }
+
+        // ObtenerPermisos_ProyectoNoMapeado_DevuelveHashSetVacio
+        [TestMethod]
+        public void ObtenerPermisos_ProyectoNoMapeado_DevuelveHashSetVacio() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            var permisos = app.ObtenerPermisosDeProyecto(proyectoNoListado);
+
+            // Assert
+            Assert.IsNotNull(permisos, "No debe devolver null aunque el proyecto no exista.");
+            Assert.AreEqual(0, permisos.Count, "Debe devolver una colección vacía.");
+        }
+
+        // ObtenerPermisos_ProyectoNulo_LanzaArgumentNullException
+        [TestMethod]
+        public void ObtenerPermisos_ProyectoNulo_LanzaArgumentNullException() {
+            // Arrange
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(() => {
+                app.ObtenerPermisosDeProyecto(null);
+            });
+        }
+
+        #endregion
+
+        #region Pruebas de ObtenerPermisosGlobales
+
+        // ObtenerPermisosGlobales_ConPermisosSolapados_DevuelveUnionSinDuplicados
+        [TestMethod]
+        public void ObtenerPermisosGlobales_ConPermisosSolapados_DevuelveUnionSinDuplicados() {
+            // Arrange
+            // Proyecto A tiene: LEER, ESCRIBIR, BORRAR
+            // Proyecto B tiene: LEER
+            // Global debería ser: LEER, ESCRIBIR, BORRAR (3 permisos únicos)
+            var app = new App(usuarioValido, todosLosProyectos);
+
+            // Act
+            var globales = app.ObtenerPermisosGlobales();
+
+            // Assert
+            Assert.AreEqual(3, globales.Count, "El conteo global es incorrecto (debería eliminar duplicados).");
+            Assert.IsTrue(globales.Contains("LEER"));
+            Assert.IsTrue(globales.Contains("ESCRIBIR"));
+            Assert.IsTrue(globales.Contains("BORRAR"));
+        }
+
+        // ObtenerPermisosGlobales_UsuarioSinPermisos_DevuelveHashSetVacio
+        [TestMethod]
+        public void ObtenerPermisosGlobales_UsuarioSinPermisos_DevuelveHashSetVacio() {
+            // Arrange
+            // Usamos el usuario que no tiene roles en ningún proyecto
+            var app = new App(usuarioSinRoles, todosLosProyectos);
+
+            // Act
+            var globales = app.ObtenerPermisosGlobales();
+
+            // Assert
+            Assert.IsNotNull(globales);
+            Assert.AreEqual(0, globales.Count);
+        }
+
+        #endregion
+
     }
 }
